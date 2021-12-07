@@ -2,6 +2,7 @@ import { Box } from "@chakra-ui/layout";
 import { FC, useState } from "react";
 import Link from "next/link";
 import styled from "@emotion/styled";
+import { useRouter } from "next/dist/client/router";
 
 const Menu = styled(Box)<{ isChild?: boolean }>`
   padding: ${({ isChild }) => (isChild ? "10px" : "30px")} 0px;
@@ -54,8 +55,12 @@ export const SideBar: FC = () => {
     },
   ];
 
-  const [active, setAcitve] = useState<string>("");
-  const [openMenu, setOpenMenu] = useState<string>("");
+  const router = useRouter();
+
+  const [_, _menu, _child] = router.pathname.split('/')
+
+  const [active, setAcitve] = useState<string>(_child);
+  const [openMenu, setOpenMenu] = useState<string>(_menu);
 
   return (
     <Box width="200px" height="100%" color="white">
