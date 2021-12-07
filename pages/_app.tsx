@@ -1,10 +1,20 @@
 import { ChakraProvider, GlobalStyle } from "@chakra-ui/react";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import { useMemo } from "react";
+import { Api } from "../api/api";
+import { Address } from "../hook/useAccount";
 import { theme } from "../theme/theme";
 import { Page } from "../views/common/Page";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const endpoints = useMemo(() => {
+    const array: string[] = ["wss://karura.api.onfinality.io/public-ws"];
+    return array
+      .map((a) => [Math.random(), a])
+      .sort((a, b) => (a[0] as number) - (b[0] as number))
+      .map((a) => a[1]) as string[];
+  }, []);
   return (
     <>
       <Head>
@@ -22,12 +32,16 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta property="twitter:url" content="https://stats.karura.network/" />
         <meta property="twitter:image" content="https://stats.karura.network/karura-og-card.png" />
       </Head>
-      <ChakraProvider theme={theme}>
-        <GlobalStyle />
-        <Page>
-          <Component {...pageProps} />
-        </Page>
-      </ChakraProvider>
+      <Api endpoints={endpoints}>
+        <Address>
+          <ChakraProvider theme={theme}>
+            <GlobalStyle />
+            <Page>
+              <Component {...pageProps} />
+            </Page>
+          </ChakraProvider>
+        </Address>
+      </Api>
     </>
   );
 }

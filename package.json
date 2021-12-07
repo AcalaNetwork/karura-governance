@@ -8,10 +8,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@acala-network/api": "^3.0.2",
+    "@acala-network/sdk-core": "^3.0.2",
+    "@acala-network/sdk-wallet": "^3.0.2",
     "@chakra-ui/icons": "^1.1.1",
     "@chakra-ui/react": "^1.7.2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@ethersproject/bignumber": "^5.5.0",
+    "@polkadot/extension-dapp": "^0.41.2",
+    "@polkadot/ui-keyring": "^0.87.5",
     "framer-motion": "^4",
     "next": "12.0.4",
     "react": "17.0.2",

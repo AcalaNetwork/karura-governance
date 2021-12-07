@@ -1,13 +1,13 @@
 import { Box } from "@chakra-ui/layout";
-import styled from "@emotion/styled";
 import { FC, useState } from "react";
-import Link from 'next/link';
+import Link from "next/link";
+import styled from "@emotion/styled";
 
 const Menu = styled(Box)<{ isChild?: boolean }>`
   padding: ${({ isChild }) => (isChild ? "10px" : "30px")} 0px;
 `;
 
-const MenuItem = styled(Box)<{ isChild?: boolean; isActive?: boolean }>`
+const MenuItem = styled(Box)<{ isChild?: boolean; isactive: boolean }>`
   position: relative;
   width: 100%;
   height: ${({ isChild }) => (isChild ? "40px" : "57.42px;")};
@@ -22,8 +22,8 @@ const MenuItem = styled(Box)<{ isChild?: boolean; isActive?: boolean }>`
   color: rgb(255, 255, 255) !important;
   cursor: pointer;
   transition: all 0.2s ease-in 0s;
-  ${({ isActive }) =>
-    isActive
+  ${({ isactive }) =>
+    isactive
       ? "background: linear-gradient(93.96deg, rgba(255, 76, 59, 0.54) -1.01%, rgba(255, 76, 59, 0) 101.52%);"
       : ""};
 
@@ -44,38 +44,11 @@ const MenuItem = styled(Box)<{ isChild?: boolean; isActive?: boolean }>`
 export const SideBar: FC = () => {
   const menus = [
     {
-      name: "Honzon",
+      name: "cdpEngine",
       children: [
         {
-          name: "cdpEngine",
-          path: "/honzon/cdpEngine",
-        },
-      ],
-    },
-    {
-      name: "Honzon1",
-      children: [
-        {
-          name: "cdpEngine1",
-          path: "/honzon/cdpEngine1",
-        },
-      ],
-    },
-    {
-      name: "Honzon2",
-      children: [
-        {
-          name: "cdpEngine2",
-          path: "/honzon/cdpEngine2",
-        },
-      ],
-    },
-    {
-      name: "Honzon3",
-      children: [
-        {
-          name: "cdpEngine3",
-          path: "/honzon/cdpEngine3",
+          name: "SetCollateralParams",
+          path: "/cdpEngine/SetCollateralParams",
         },
       ],
     },
@@ -90,7 +63,7 @@ export const SideBar: FC = () => {
         {menus.map(({ name, children }, index) => {
           return (
             <>
-              <MenuItem key={index} isActive={name === active} onClick={() => setOpenMenu(name)}>
+              <MenuItem key={`item-${index}`} isactive={name === active} onClick={() => setOpenMenu(name)}>
                 {name}
               </MenuItem>
               {children.length &&
@@ -98,8 +71,8 @@ export const SideBar: FC = () => {
                 children.map(({ name: childName, path }, i) => (
                   <MenuItem
                     isChild
-                    key={`${index}-${i}`}
-                    isActive={childName === active}
+                    key={`item-child-${index}-${i}`}
+                    isactive={childName === active}
                     onClick={() => setAcitve(childName)}
                   >
                     <Link href={path}>{childName}</Link>
