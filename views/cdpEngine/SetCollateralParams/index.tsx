@@ -1,8 +1,9 @@
+import { forceToCurrencyId } from "@acala-network/sdk-core";
 import { FormControl, FormLabel, FormHelperText } from "@chakra-ui/form-control";
 import { Box, Flex } from "@chakra-ui/layout";
-import { Input, Switch, Select, Button, useToast } from "@chakra-ui/react";
+import { Input, Switch, Select, Button, useToast, ToastId } from "@chakra-ui/react";
 import styled from "@emotion/styled";
-import { ChangeEvent, FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 import { useAddress } from "../../../hook/useAccount";
 import { useApi } from "../../../hook/useApi";
 import { formatNumberString, generateNumberString, getSigner, handleTxResults } from "../../../utils";
@@ -12,6 +13,8 @@ const CBox = styled(Box)`
   margin: 0 auto;
   width: 440px;
 `;
+
+type IParamField = 'interestRatePerSec' |  'liquidationRatio' | 'liquidationPenalty' | 'requiredCollateralRatio' | 'maximumTotalDebitValue'
 
 interface IParams {
   interestRatePerSec: string;
@@ -34,6 +37,13 @@ export const SetCollateralParams: FC = () => {
     maximumTotalDebitValue: "0",
   });
   const [newParams, setNewParams] = useState<IParams>({} as unknown as IParams);
+  const refs = {
+    interestRatePerSec: useRef(null),
+    liquidationRatio: useRef(null),
+    liquidationPenalty: useRef(null),
+    requiredCollateralRatio: useRef(null),
+    maximumTotalDebitValue: useRef(null),
+  };
 
   const toast = useToast({
     title: `Submitint......`,
@@ -64,9 +74,15 @@ export const SetCollateralParams: FC = () => {
   };
 
   const handleSwitchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const id = e.target.id.split("-")[0];
-    const set = e.target.checked ? Array.from(new Set(actives.concat([id]))) : actives.filter((e) => e != id);
-    setActives(set);
+    const id = e.target.id.split("-")[0] as IParamField;
+    if(e.target.checked) {
+      setActives(Array.from(new Set(actives.concat([id]))))
+    } else {
+      if(refs[id] && refs[id].current) {
+        refs[id].current.value = null;
+      }
+      setActives(actives.filter((e) => e != id))
+    }
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>, field: string) => {
@@ -79,46 +95,46 @@ export const SetCollateralParams: FC = () => {
   const { activeAddress } = useAddress();
 
   const handleClick = async () => {
-    const oldParams = {} as unknown as IParams;
-    const _newParams = {} as unknown as IParams;
-    Object.keys(params).forEach((key) => {
-      oldParams[key] = generateNumberString(params[key]);
-    });
-    Object.keys(newParams).forEach((key) => {
+    const submitParams: any = {};
+    (Object.keys(newParams) as IParamField[]).forEach(key => {
       if (actives.includes(key)) {
-        _newParams[key] = newParams[key];
+        submitParams[key] = newParams[key];
       }
     });
-    const submitParams = Object.assign(oldParams, _newParams);
-
+    setLoading(true);
+    const toastId = toast({
+      title: `Submitint CdpEngine setCollateralParams......`,
+      position: "top-right",
+      isClosable: true,
+    });
     const tx = await api.tx.cdpEngine.setCollateralParams(
-      token,
-      submitParams.interestRatePerSec,
-      submitParams.liquidationRatio,
-      submitParams.liquidationPenalty,
-      submitParams.requiredCollateralRatio,
-      submitParams.maximumTotalDebitValue
+      forceToCurrencyId(api, token),
+      submitParams.interestRatePerSec ? { NewValue: submitParams.interestRatePerSec } : null,
+      submitParams.liquidationRatio ? { NewValue: submitParams.liquidationRatio } : null,
+      submitParams.liquidationPenalty ? { NewValue: submitParams.liquidationPenalty } : null,
+      submitParams.requiredCollateralRatio ? { NewValue: submitParams.requiredCollateralRatio } : null,
+      submitParams.maximumTotalDebitValue ? { NewValue: submitParams.maximumTotalDebitValue } : null
     );
     const signer = await getSigner(activeAddress);
     await tx.signAsync(activeAddress, { signer });
-    setLoading(true);
     const unsubscribe = await tx.send(
       handleTxResults(
-        'send',
+        "send",
         {
           txFailedCb: (r) => {
-            toast({
-              status: 'error',
-              description: r.find(({ status }) => status === 'error')?.message,
-              duration: 5000
+            toast.update(toastId as ToastId, {
+              status: "error",
+              description: r.find(({ status }) => status === "error")?.message,
+              duration: 5000,
             });
           },
-          txSuccessCb: (r) => {
-            toast({
-              status: 'success',
-              duration: 1500
+          txSuccessCb: () => {
+            (Object.keys(refs) as IParamField[]).forEach(ref => refs[ref].current.value = null);
+            toast.update(toastId as ToastId, {
+              status: "success",
+              duration: 1500,
             });
-          }
+          },
         },
         (): void => {
           setLoading(false);
@@ -143,10 +159,11 @@ export const SetCollateralParams: FC = () => {
           <FormLabel>InterestRatePerSec</FormLabel>
           <Flex alignItems="center">
             <FormLabel>isChange</FormLabel>
-            <Switch onChange={(e) => handleSwitchChange(e)} id="interestRatePerSec-change" />
+            <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="interestRatePerSec-change" />
           </Flex>
         </Flex>
         <Input
+          ref={refs.interestRatePerSec}
           onChange={(e) => handleInputChange(e, "interestRatePerSec")}
           isDisabled={!actives.includes("interestRatePerSec")}
           type="number"
@@ -158,10 +175,11 @@ export const SetCollateralParams: FC = () => {
           <FormLabel>liquidationRatio</FormLabel>
           <Flex alignItems="center">
             <FormLabel>isChange</FormLabel>
-            <Switch onChange={(e) => handleSwitchChange(e)} id="liquidationRatio-change" />
+            <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="liquidationRatio-change" />
           </Flex>
         </Flex>
         <Input
+          ref={refs.liquidationRatio}
           onChange={(e) => handleInputChange(e, "liquidationRatio")}
           isDisabled={!actives.includes("liquidationRatio")}
           type="number"
@@ -173,10 +191,11 @@ export const SetCollateralParams: FC = () => {
           <FormLabel>liquidationPenalty</FormLabel>
           <Flex alignItems="center">
             <FormLabel>isChange</FormLabel>
-            <Switch onChange={(e) => handleSwitchChange(e)} id="liquidationPenalty-change" />
+            <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="liquidationPenalty-change" />
           </Flex>
         </Flex>
         <Input
+          ref={refs.liquidationPenalty}
           onChange={(e) => handleInputChange(e, "liquidationPenalty")}
           isDisabled={!actives.includes("liquidationPenalty")}
           type="number"
@@ -188,10 +207,11 @@ export const SetCollateralParams: FC = () => {
           <FormLabel>requiredCollateralRatio</FormLabel>
           <Flex alignItems="center">
             <FormLabel>isChange</FormLabel>
-            <Switch onChange={(e) => handleSwitchChange(e)} id="requiredCollateralRatio-change" />
+            <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="requiredCollateralRatio-change" />
           </Flex>
         </Flex>
         <Input
+          ref={refs.requiredCollateralRatio}
           onChange={(e) => handleInputChange(e, "requiredCollateralRatio")}
           isDisabled={!actives.includes("requiredCollateralRatio")}
           type="number"
@@ -203,10 +223,11 @@ export const SetCollateralParams: FC = () => {
           <FormLabel>maximumTotalDebitValue</FormLabel>
           <Flex alignItems="center">
             <FormLabel>isChange</FormLabel>
-            <Switch onChange={(e) => handleSwitchChange(e)} id="maximumTotalDebitValue-change" />
+            <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="maximumTotalDebitValue-change" />
           </Flex>
         </Flex>
         <Input
+          ref={refs.maximumTotalDebitValue}
           onChange={(e) => handleInputChange(e, "maximumTotalDebitValue")}
           isDisabled={!actives.includes("maximumTotalDebitValue")}
           type="number"
