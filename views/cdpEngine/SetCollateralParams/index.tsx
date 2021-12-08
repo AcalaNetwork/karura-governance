@@ -14,7 +14,12 @@ const CBox = styled(Box)`
   width: 440px;
 `;
 
-type IParamField = 'interestRatePerSec' |  'liquidationRatio' | 'liquidationPenalty' | 'requiredCollateralRatio' | 'maximumTotalDebitValue'
+type IParamField =
+  | "interestRatePerSec"
+  | "liquidationRatio"
+  | "liquidationPenalty"
+  | "requiredCollateralRatio"
+  | "maximumTotalDebitValue";
 
 interface IParams {
   interestRatePerSec: string;
@@ -26,9 +31,11 @@ interface IParams {
 
 export const SetCollateralParams: FC = () => {
   const { api } = useApi();
+  const { activeAddress } = useAddress();
   const [actives, setActives] = useState<string[]>([]);
   const [token, setToken] = useState<string>("KSM");
   const [loading, setLoading] = useState<boolean>(true);
+  const [members, setMembers] = useState<string[]>([]);
   const [params, setParams] = useState<IParams>({
     interestRatePerSec: "0",
     liquidationRatio: "0",
@@ -66,6 +73,11 @@ export const SetCollateralParams: FC = () => {
       });
       setLoading(false);
     });
+
+    api.query.financialCouncilMembership.members().then((result) => {
+      const formatResult = (result as any).map((i: any) => i.toString());
+      setMembers(formatResult);
+    });
   }, [api, api?.query?.cdpEngine?.collateralParams, token]);
 
   const handleTokenChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -75,13 +87,13 @@ export const SetCollateralParams: FC = () => {
 
   const handleSwitchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const id = e.target.id.split("-")[0] as IParamField;
-    if(e.target.checked) {
-      setActives(Array.from(new Set(actives.concat([id]))))
+    if (e.target.checked) {
+      setActives(Array.from(new Set(actives.concat([id]))));
     } else {
-      if(refs[id] && refs[id].current) {
+      if (refs[id] && refs[id].current) {
         refs[id].current.value = null;
       }
-      setActives(actives.filter((e) => e != id))
+      setActives(actives.filter((e) => e != id));
     }
   };
 
@@ -92,11 +104,16 @@ export const SetCollateralParams: FC = () => {
     setNewParams(result);
   };
 
-  const { activeAddress } = useAddress();
-
   const handleClick = async () => {
+    if (!members.includes(activeAddress)) {
+      return toast({
+        status: "error",
+        description: "You are not a member of the council",
+        duration: 2000,
+      });
+    }
     const submitParams: any = {};
-    (Object.keys(newParams) as IParamField[]).forEach(key => {
+    (Object.keys(newParams) as IParamField[]).forEach((key) => {
       if (actives.includes(key)) {
         submitParams[key] = newParams[key];
       }
@@ -107,7 +124,7 @@ export const SetCollateralParams: FC = () => {
       position: "top-right",
       isClosable: true,
     });
-    const tx = await api.tx.cdpEngine.setCollateralParams(
+    const call = api.tx.cdpEngine.setCollateralParams(
       forceToCurrencyId(api, token),
       submitParams.interestRatePerSec ? { NewValue: submitParams.interestRatePerSec } : null,
       submitParams.liquidationRatio ? { NewValue: submitParams.liquidationRatio } : null,
@@ -115,6 +132,7 @@ export const SetCollateralParams: FC = () => {
       submitParams.requiredCollateralRatio ? { NewValue: submitParams.requiredCollateralRatio } : null,
       submitParams.maximumTotalDebitValue ? { NewValue: submitParams.maximumTotalDebitValue } : null
     );
+    const tx = await api.tx.financialCouncil.propose(Math.ceil(members.length / 2), call, call.length);
     const signer = await getSigner(activeAddress);
     await tx.signAsync(activeAddress, { signer });
     const unsubscribe = await tx.send(
@@ -129,7 +147,7 @@ export const SetCollateralParams: FC = () => {
             });
           },
           txSuccessCb: () => {
-            (Object.keys(refs) as IParamField[]).forEach(ref => refs[ref].current.value = null);
+            (Object.keys(refs) as IParamField[]).forEach((ref) => (refs[ref].current.value = null));
             toast.update(toastId as ToastId, {
               status: "success",
               duration: 1500,
