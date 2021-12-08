@@ -91,7 +91,7 @@ export const SetCollateralParams: FC = () => {
       setActives(Array.from(new Set(actives.concat([id]))));
     } else {
       if (refs[id] && refs[id].current) {
-        refs[id].current.value = null;
+        (refs[id].current as unknown as HTMLInputElement).value = '';
       }
       setActives(actives.filter((e) => e != id));
     }
@@ -147,7 +147,7 @@ export const SetCollateralParams: FC = () => {
             });
           },
           txSuccessCb: () => {
-            (Object.keys(refs) as IParamField[]).forEach((ref) => (refs[ref].current.value = null));
+            (Object.keys(refs) as IParamField[]).forEach((ref) => (refs[ref].current as unknown as HTMLInputElement).value = '');
             toast.update(toastId as ToastId, {
               status: "success",
               duration: 1500,
