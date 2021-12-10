@@ -1,9 +1,21 @@
 import { forceToCurrencyId } from "@acala-network/sdk-core";
 import { FormControl, FormLabel, FormHelperText } from "@chakra-ui/form-control";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { Box, Flex } from "@chakra-ui/layout";
-import { Input, Switch, Select, Button, useToast, ToastId } from "@chakra-ui/react";
+import {
+  Input,
+  Switch,
+  Select,
+  Button,
+  useToast,
+  ToastId,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from "@chakra-ui/react";
 import styled from "@emotion/styled";
-import { ChangeEvent, FC, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 import { useAddress } from "../../../hook/useAccount";
 import { useApi } from "../../../hook/useApi";
 import { formatNumberString, generateNumberString, getSigner, handleTxResults } from "../../../utils";
@@ -80,9 +92,9 @@ export const SetCollateralParams: FC = () => {
     });
   }, [api, api?.query?.cdpEngine?.collateralParams, token]);
 
-  const handleTokenChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleTokenChange = (value: string) => {
     setLoading(true);
-    setToken(e.target.value);
+    setToken(value);
   };
 
   const handleSwitchChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -91,7 +103,7 @@ export const SetCollateralParams: FC = () => {
       setActives(Array.from(new Set(actives.concat([id]))));
     } else {
       if (refs[id] && refs[id].current) {
-        (refs[id].current as unknown as HTMLInputElement).value = '';
+        (refs[id].current as unknown as HTMLInputElement).value = "";
       }
       setActives(actives.filter((e) => e != id));
     }
@@ -147,7 +159,9 @@ export const SetCollateralParams: FC = () => {
             });
           },
           txSuccessCb: () => {
-            (Object.keys(refs) as IParamField[]).forEach((ref) => (refs[ref].current as unknown as HTMLInputElement).value = '');
+            (Object.keys(refs) as IParamField[]).forEach(
+              (ref) => ((refs[ref].current as unknown as HTMLInputElement).value = "")
+            );
             toast.update(toastId as ToastId, {
               status: "success",
               duration: 1500,
@@ -166,11 +180,44 @@ export const SetCollateralParams: FC = () => {
     <CBox>
       <FormControl id="token" mb="20px">
         <FormLabel alignItems="center">Token</FormLabel>
-        <Select onChange={(e) => handleTokenChange(e)}>
-          <option value="KSM">KSM</option>
-          <option value="LKSM">LKSM</option>
-          <option value="KAR">KAR</option>
-        </Select>
+        <Menu colorScheme="gray">
+          <MenuButton
+            width='100%'
+            as={Button}
+            variant="outline"
+            color="white"
+            _hover={{ bg: "transparent" }}
+            _active={{ bg: "transparent" }}
+          >
+            <Flex alignItems="center" justifyContent="space-between">
+              {token}
+              <ChevronDownIcon />
+            </Flex>
+          </MenuButton>
+          <MenuList bg="gray.800" borderColor="gray.600">
+            <MenuItem
+              _focus={{ bg: "transparent" }}
+              _hover={{ bg: "gray.600" }}
+              onClick={() => handleTokenChange('KSM')}
+            >
+              KSM
+            </MenuItem>
+            <MenuItem
+              _focus={{ bg: "transparent" }}
+              _hover={{ bg: "gray.600" }}
+              onClick={() => handleTokenChange('LKSM')}
+            >
+              LKSM
+            </MenuItem>
+            <MenuItem
+              _focus={{ bg: "transparent" }}
+              _hover={{ bg: "gray.600" }}
+              onClick={() => handleTokenChange('KAR')}
+            >
+              KAR
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </FormControl>
       <FormControl id="interestRatePerSec" mb="20px">
         <Flex justifyContent="space-between" alignItems="center">
