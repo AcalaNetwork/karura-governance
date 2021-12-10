@@ -9,7 +9,7 @@ export const Page: FC = ({ children }) => {
       <Header></Header>
       <Flex height="calc(100% - 60px)">
         <SideBar />
-        <Box flex="1" maxHeight="calc(100vh - 60px)" overflowY='auto' overflowX='hidden' padding="20px" boxSizing="border-box">
+        <Box flex="1" maxHeight="calc(100vh - 60px)" bg="#f0f2f5" overflowY='auto' overflowX='hidden' padding="20px" boxSizing="border-box">
           {children}
         </Box>
       </Flex>

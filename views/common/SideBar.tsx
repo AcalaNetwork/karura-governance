@@ -4,6 +4,14 @@ import Link from "next/link";
 import styled from "@emotion/styled";
 import { useRouter } from "next/dist/client/router";
 
+const CBox = styled.div`
+  box-shadow: 2px 0 8px 0 rgb(29 35 41 / 5%);
+  width: 200px;
+  height: 100%;
+  color: gray.800;
+  background: white;
+`;
+
 const Menu = styled(Box)<{ isChild?: boolean }>`
   padding: ${({ isChild }) => (isChild ? "10px" : "30px")} 0px;
 `;
@@ -18,18 +26,17 @@ const MenuItem = styled(Box)<{ isChild?: boolean; isactive: boolean }>`
   align-items: center;
   justify-content: flex-start;
   font-size: 14px;
-  font-weight: 500;
   line-height: 17px;
-  color: rgb(255, 255, 255) !important;
+  color: gray.800;
   cursor: pointer;
   transition: all 0.2s ease-in 0s;
   ${({ isactive }) =>
     isactive
-      ? "background: linear-gradient(93.96deg, rgba(255, 76, 59, 0.54) -1.01%, rgba(255, 76, 59, 0) 101.52%);"
+      ? "background: #e6f7ff;"
       : ""};
 
   &:hover {
-    background: linear-gradient(93.96deg, rgba(255, 76, 59, 0.54) -1.01%, rgba(255, 76, 59, 0) 101.52%);
+    background: #e6f7ff;
     > ::before {
       content: '',
       width: 4px;
@@ -57,13 +64,13 @@ export const SideBar: FC = () => {
 
   const router = useRouter();
 
-  const [_, _menu, _child] = router.pathname.split('/')
+  const [_, _menu, _child] = router.pathname.split("/");
 
   const [active, setAcitve] = useState<string>(_child);
   const [openMenu, setOpenMenu] = useState<string>(_menu);
 
   return (
-    <Box width="200px" height="100%" color="white">
+    <CBox>
       <Menu>
         {menus.map(({ name, children }, index) => {
           return (
@@ -87,6 +94,6 @@ export const SideBar: FC = () => {
           );
         })}
       </Menu>
-    </Box>
+    </CBox>
   );
 };

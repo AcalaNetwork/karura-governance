@@ -21,9 +21,16 @@ import { useApi } from "../../../hook/useApi";
 import { formatNumberString, generateNumberString, getSigner, handleTxResults } from "../../../utils";
 
 const CBox = styled(Box)`
-  padding: 20px;
+  padding: 30px 40px;
   margin: 0 auto;
-  width: 440px;
+  width: 500px;
+  background: #ffffff;
+  border-radius: 8px;
+`;
+
+const CFormLabel = styled(FormLabel)`
+  margin: 0px 4px 0px 0px;
+  height: 28px;
 `;
 
 type IParamField =
@@ -179,13 +186,13 @@ export const SetCollateralParams: FC = () => {
   return (
     <CBox>
       <FormControl id="token" mb="20px">
-        <FormLabel alignItems="center">Token</FormLabel>
+        <CFormLabel alignItems="center">Token</CFormLabel>
         <Menu colorScheme="gray">
           <MenuButton
-            width='100%'
+            width="100%"
             as={Button}
             variant="outline"
-            color="white"
+            color="gray.800"
             _hover={{ bg: "transparent" }}
             _active={{ bg: "transparent" }}
           >
@@ -194,26 +201,14 @@ export const SetCollateralParams: FC = () => {
               <ChevronDownIcon />
             </Flex>
           </MenuButton>
-          <MenuList bg="gray.800" borderColor="gray.600">
-            <MenuItem
-              _focus={{ bg: "transparent" }}
-              _hover={{ bg: "gray.600" }}
-              onClick={() => handleTokenChange('KSM')}
-            >
+          <MenuList bg="gray.100" borderColor="gray.100">
+            <MenuItem _hover={{ bg: "gray.300" }} onClick={() => handleTokenChange("KSM")}>
               KSM
             </MenuItem>
-            <MenuItem
-              _focus={{ bg: "transparent" }}
-              _hover={{ bg: "gray.600" }}
-              onClick={() => handleTokenChange('LKSM')}
-            >
+            <MenuItem _hover={{ bg: "gray.300" }} onClick={() => handleTokenChange("LKSM")}>
               LKSM
             </MenuItem>
-            <MenuItem
-              _focus={{ bg: "transparent" }}
-              _hover={{ bg: "gray.600" }}
-              onClick={() => handleTokenChange('KAR')}
-            >
+            <MenuItem _hover={{ bg: "gray.300" }} onClick={() => handleTokenChange("KAR")}>
               KAR
             </MenuItem>
           </MenuList>
@@ -221,9 +216,9 @@ export const SetCollateralParams: FC = () => {
       </FormControl>
       <FormControl id="interestRatePerSec" mb="20px">
         <Flex justifyContent="space-between" alignItems="center">
-          <FormLabel>InterestRatePerSec</FormLabel>
+          <CFormLabel>InterestRate per sec</CFormLabel>
           <Flex alignItems="center">
-            <FormLabel>isChange</FormLabel>
+            <CFormLabel>isChange</CFormLabel>
             <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="interestRatePerSec-change" />
           </Flex>
         </Flex>
@@ -237,9 +232,9 @@ export const SetCollateralParams: FC = () => {
       </FormControl>
       <FormControl id="liquidationRatio" mb="20px">
         <Flex justifyContent="space-between" alignItems="center">
-          <FormLabel>liquidationRatio</FormLabel>
+          <CFormLabel>Liquidation ratio</CFormLabel>
           <Flex alignItems="center">
-            <FormLabel>isChange</FormLabel>
+            <CFormLabel>isChange</CFormLabel>
             <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="liquidationRatio-change" />
           </Flex>
         </Flex>
@@ -253,9 +248,9 @@ export const SetCollateralParams: FC = () => {
       </FormControl>
       <FormControl id="liquidationPenalty" mb="20px">
         <Flex justifyContent="space-between" alignItems="center">
-          <FormLabel>liquidationPenalty</FormLabel>
+          <CFormLabel>Liquidation penalty</CFormLabel>
           <Flex alignItems="center">
-            <FormLabel>isChange</FormLabel>
+            <CFormLabel>isChange</CFormLabel>
             <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="liquidationPenalty-change" />
           </Flex>
         </Flex>
@@ -269,9 +264,9 @@ export const SetCollateralParams: FC = () => {
       </FormControl>
       <FormControl id="requiredCollateralRatio" mb="20px">
         <Flex justifyContent="space-between" alignItems="center">
-          <FormLabel>requiredCollateralRatio</FormLabel>
+          <CFormLabel>Required collateral ratio</CFormLabel>
           <Flex alignItems="center">
-            <FormLabel>isChange</FormLabel>
+            <CFormLabel>isChange</CFormLabel>
             <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="requiredCollateralRatio-change" />
           </Flex>
         </Flex>
@@ -285,9 +280,9 @@ export const SetCollateralParams: FC = () => {
       </FormControl>
       <FormControl id="maximumTotalDebitValue" mb="20px">
         <Flex justifyContent="space-between" alignItems="center">
-          <FormLabel>maximumTotalDebitValue</FormLabel>
+          <CFormLabel>Maximum total debit value</CFormLabel>
           <Flex alignItems="center">
-            <FormLabel>isChange</FormLabel>
+            <CFormLabel>isChange</CFormLabel>
             <Switch isDisabled={loading} onChange={(e) => handleSwitchChange(e)} id="maximumTotalDebitValue-change" />
           </Flex>
         </Flex>

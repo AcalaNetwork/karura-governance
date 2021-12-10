@@ -14,6 +14,7 @@ export const Header: FC = () => {
       alignItems="center"
       padding="0px 30px"
       borderBottom="1px solid var(--chakra-colors-gray-500)"
+      bg='gray.800'
     >
       <Menu colorScheme='gray'>
         <MenuButton
@@ -28,11 +29,11 @@ export const Header: FC = () => {
             <ChevronDownIcon />
           </Flex>
         </MenuButton>
-        <MenuList bg="gray.800" borderColor="gray.600">
+        <MenuList bg="gray.50" borderColor="gray.200">
           {addresses?.map((address) => (
             <MenuItem
               _focus={{bg: "transparent"}}
-              _hover={{ bg: "gray.600" }}
+              _hover={{ bg: "gray.300" }}
               key={address.address}
               value={address.address}
               onClick={() => changeActive(address.address)}

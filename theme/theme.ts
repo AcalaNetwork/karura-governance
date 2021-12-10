@@ -10,8 +10,6 @@ const styles = {
       width: '100vw',
       height: '100vh',
       margin: '0',
-      background: 'gray.800',
-      color: 'white',
       fontFamily: 'Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue"',
     }
   }
@@ -19,5 +17,5 @@ const styles = {
 
 export const theme = extendTheme({
   colors,
-  styles
+  styles,
 })
